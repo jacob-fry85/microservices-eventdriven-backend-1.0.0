@@ -18,7 +18,6 @@ public class ChallengeAttempt {
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="USER_ID")
     private User user;
-
     private int factorA;
     private int factorB;
     private int resultAttempt;

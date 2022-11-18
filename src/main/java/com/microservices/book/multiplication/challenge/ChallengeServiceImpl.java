@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 
 @Service
@@ -18,8 +19,18 @@ public class ChallengeServiceImpl implements ChallengeService{
 
     private final UserRepository userRepository;
     private final ChallengeAttemptRepository attemptRepository;
-    private final GamificationServiceClient gameClient;
+//    private final GamificationServiceClient gameClient;
 
+    private final ChallengeEventPub challengeEventPub;
+
+    /**
+     * If there is an exception in a method annotated with @Transactional, the transaction
+     * will be rolled back. If we would need all our methods within a given service to be
+     * transactional, we can add instead this annotation at the class level.
+     * @param attemptDTO
+     * @return
+     */
+    @Transactional
     @Override
     public ChallengeAttempt verifyAttempt(ChallengeAttemptDTO attemptDTO) {
 //        check if user already exists for that alias, otherwise create it
@@ -47,8 +58,10 @@ public class ChallengeServiceImpl implements ChallengeService{
         ChallengeAttempt storedAttempt = attemptRepository.save(checkedAttempt);
 
 //        Sends the attempt to gamification and prints the response
-        boolean status = gameClient.sendAttempt(storedAttempt);
-        log.info("Gamification service response: {} ", status);
+//        boolean status = gameClient.sendAttempt(storedAttempt);
+//        log.info("Gamification service response: {} ", status);
+
+        challengeEventPub.challengeSolved(storedAttempt);
 
         return storedAttempt;
     }

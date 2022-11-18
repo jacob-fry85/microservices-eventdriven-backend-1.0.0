@@ -29,7 +29,11 @@ public class ChallengeServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock private GamificationServiceClient gameClient;
+//    @Mock private GamificationServiceClient gameClient;
+
+    @Mock
+    private ChallengeEventPub challengeEventPub;
+
     @Mock
     private ChallengeAttemptRepository attemptRepository;
 
@@ -38,7 +42,8 @@ public class ChallengeServiceTest {
         challengeService = new ChallengeServiceImpl(
                 userRepository,
                 attemptRepository,
-                gameClient
+                challengeEventPub
+//                gameClient
         );
         given(attemptRepository.save(any()))
             .will(returnsFirstArg());
@@ -55,7 +60,7 @@ public class ChallengeServiceTest {
 //        then
         then(resultAttempt.isCorrect()).isTrue();
 
-        verify(gameClient).sendAttempt(resultAttempt);
+        verify(challengeEventPub).challengeSolved(resultAttempt);
         verify(userRepository).save(new User("Max"));
         verify(attemptRepository).save(resultAttempt);
     }
